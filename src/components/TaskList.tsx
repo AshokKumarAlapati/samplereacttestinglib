@@ -43,29 +43,30 @@ export function TaskList() {
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Add a new task"
           className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          data-testid="new-task-input"
+          aria-label="New task input"
         />
         <button
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          data-testid="add-task-button"
+          aria-label="Add task"
         >
           <Plus className="w-5 h-5" />
         </button>
       </form>
 
-      <ul className="space-y-3">
+      <ul className="space-y-3" role="list">
         {tasks.map(task => (
           <li
             key={task.id}
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+            role="listitem"
           >
             <input
               type="checkbox"
               checked={task.completed}
               onChange={() => toggleTask(task.id)}
               className="w-5 h-5 text-blue-500"
-              data-testid={`task-checkbox-${task.id}`}
+              aria-label={`Mark "${task.text}" as ${task.completed ? 'incomplete' : 'complete'}`}
             />
             <span
               className={`flex-1 ${
@@ -77,7 +78,7 @@ export function TaskList() {
             <button
               onClick={() => deleteTask(task.id)}
               className="text-red-500 hover:text-red-700"
-              data-testid={`delete-button-${task.id}`}
+              aria-label={`Delete "${task.text}"`}
             >
               <Trash2 className="w-5 h-5" />
             </button>
