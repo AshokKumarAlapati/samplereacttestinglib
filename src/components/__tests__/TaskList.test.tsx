@@ -8,12 +8,12 @@ describe('TaskList', () => {
   });
 
   it('renders the task manager title', () => {
-    expect(screen.getByText('Task Manager')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Task Manager' })).toBeInTheDocument();
   });
 
   it('adds a new task when the form is submitted', () => {
-    const input = screen.getByTestId('new-task-input');
-    const addButton = screen.getByTestId('add-task-button');
+    const input = screen.getByRole('textbox', { name: 'New task input' });
+    const addButton = screen.getByRole('button', { name: 'Add task' });
     
     fireEvent.change(input, { target: { value: 'New test task' } });
     fireEvent.click(addButton);
@@ -23,14 +23,16 @@ describe('TaskList', () => {
   });
 
   it('toggles task completion when checkbox is clicked', async () => {
-    const input = screen.getByTestId('new-task-input');
-    const addButton = screen.getByTestId('add-task-button');
+    const input = screen.getByRole('textbox', { name: 'New task input' });
+    const addButton = screen.getByRole('button', { name: 'Add task' });
     
     fireEvent.change(input, { target: { value: 'Toggle test task' } });
     fireEvent.click(addButton);
     
     const taskText = screen.getByText('Toggle test task');
-    const checkbox = screen.getByTestId(/task-checkbox/);
+    const checkbox = screen.getByRole('checkbox', { 
+      name: 'Mark "Toggle test task" as complete'
+    });
     
     // Initial state - not completed
     expect(taskText.className).not.toContain('line-through');
@@ -45,8 +47,8 @@ describe('TaskList', () => {
   });
 
   it('deletes a task when delete button is clicked', () => {
-    const input = screen.getByTestId('new-task-input');
-    const addButton = screen.getByTestId('add-task-button');
+    const input = screen.getByRole('textbox', { name: 'New task input' });
+    const addButton = screen.getByRole('button', { name: 'Add task' });
     const taskText = 'Task to delete';
     
     fireEvent.change(input, { target: { value: taskText } });
@@ -54,26 +56,29 @@ describe('TaskList', () => {
     
     expect(screen.getByText(taskText)).toBeInTheDocument();
     
-    const deleteButton = screen.getByTestId(/delete-button/);
+    const deleteButton = screen.getByRole('button', { 
+      name: `Delete "${taskText}"`
+    });
     fireEvent.click(deleteButton);
     
     expect(screen.queryByText(taskText)).not.toBeInTheDocument();
   });
 
   it('does not add empty tasks', () => {
-    const addButton = screen.getByTestId('add-task-button');
-    const initialTaskCount = screen.queryAllByRole('listitem').length;
+    const addButton = screen.getByRole('button', { name: 'Add task' });
+    const taskList = screen.getByRole('list');
+    const initialTasks = taskList.children.length;
     
     // Try to add empty task
     fireEvent.click(addButton);
     
     // Verify no new task was added
-    expect(screen.queryAllByRole('listitem')).toHaveLength(initialTaskCount);
+    expect(taskList.children.length).toBe(initialTasks);
   });
 
   it('trims whitespace from task text', () => {
-    const input = screen.getByTestId('new-task-input');
-    const addButton = screen.getByTestId('add-task-button');
+    const input = screen.getByRole('textbox', { name: 'New task input' });
+    const addButton = screen.getByRole('button', { name: 'Add task' });
     
     fireEvent.change(input, { target: { value: '  Task with spaces  ' } });
     fireEvent.click(addButton);
@@ -82,8 +87,8 @@ describe('TaskList', () => {
   });
 
   it('handles multiple tasks correctly', () => {
-    const input = screen.getByTestId('new-task-input');
-    const addButton = screen.getByTestId('add-task-button');
+    const input = screen.getByRole('textbox', { name: 'New task input' });
+    const addButton = screen.getByRole('button', { name: 'Add task' });
     const tasks = ['Task 1', 'Task 2', 'Task 3'];
     
     tasks.forEach(taskText => {
@@ -95,6 +100,7 @@ describe('TaskList', () => {
       expect(screen.getByText(taskText)).toBeInTheDocument();
     });
     
-    expect(screen.queryAllByRole('listitem')).toHaveLength(tasks.length);
+    const taskList = screen.getByRole('list');
+    expect(taskList.children.length).toBe(tasks.length);
   });
 });
